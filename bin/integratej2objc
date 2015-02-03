@@ -73,7 +73,7 @@ class J2ObjcSharedLibSmanger < Thor
 		def recreate_group_at_root(group_name, project_root, path_relative_to_project, project)
 			new_group = project.new_group(group_name, path_relative_to_project, :project)
 			add_tree_to_group(File.join(project_root, path_relative_to_project), new_group)
-			puts "#{new_group.files}"
+			puts "#{new_group.recursive_children}"
 		end
 
 		def target_named_in_project(target_name, project) 
