@@ -36,7 +36,14 @@ class J2ObjcSharedLibSmanger < Thor
 
 		group_files = files_for_group(group, current_project)
 
-		target_named_in_project(target, current_project).add_file_references(group_files)
+		target_obj = target_named_in_project(target, current_project)
+
+		puts "adding files to #{target_obj.name}:"
+		group_files.each do |f|
+			puts "\t#{f.hierarchy_path}"
+		end
+
+		target_obj.add_file_references(group_files)
 
 		current_project.save
 	end
