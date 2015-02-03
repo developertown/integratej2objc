@@ -51,7 +51,9 @@ class J2ObjcSharedLibSmanger < Thor
 
 	no_commands do		
 		def files_for_group(group_name, project)
-			project[group_name].files
+			group_actual = project[group_name]
+			puts "getting files for group: #{group_actual.pretty_print}"
+			group_actual.files
 		end
 
 		def remove_old_group_and_files(group_name, project)
