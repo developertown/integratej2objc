@@ -99,6 +99,8 @@ class J2ObjcSharedLibSmanger < Thor
 					file_references << add_file_to_group(f, group)
 				end
 			end
+
+			file_references
 		end
 
 		def path_is_relative_directory?(path)
