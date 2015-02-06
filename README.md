@@ -3,9 +3,15 @@
 J2Objc and Gradle will generate your files and put them in a source directory, but they won't update your xcode project to actually reflect the new truth. This gem provides the integratej2objc executable that uses the xcodeproj gem to update your project.  Can be included as a last task after gradle does it's thing.
 
 ## Installation
-Install it:
+Currently the gem is not deployed to rubygems.  The best way I've found to use it locally is with bundler
 
-    $ gem install integratej2objc
+Gemfile entry:
+```
+gem 'integratej2objc', git:'https://github.com/developertown/integratej2objc.git'
+```
+
+`bundle; bundle exec integratej2objc help;`
+
 
 ## Usage
 
