@@ -13,4 +13,4 @@
 *.a
 mkmf.log
 
-sepc/fixture/test_temp/
+spec/fixture/test_temp/
