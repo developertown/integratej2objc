@@ -1,15 +1,16 @@
 require 'xcodeproj'
-
+require 'pry'
 module IntegrateJ2objc
 	class J2ObjcSharedLibSmanger
-		def integrate_source()
+		def integrate_source(options)
 			project_root = options[:project_root]
 			project = options[:xcodeproj]
 			source_root = options[:source_root]
 			group = options[:group]
 			target = options[:target]
 
-
+			binding.pry
+			
 			command_relative_group_root = File.join(project_root, source_root)
 
 			current_project = Xcodeproj::Project.open File.join(project_root, project)

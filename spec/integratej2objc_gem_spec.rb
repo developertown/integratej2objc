@@ -51,7 +51,7 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 		expect(@generated_files_dir).to contain_only_files(files)
 	end
 
-	xit "works exactly like before these infernal tests" do		
+	it "works exactly like before these infernal tests" do		
 		capture_old_generated_files
 		prepare_generated_files_for_test
 		old_files_should_be_in_group
@@ -83,7 +83,13 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 	end
 
 	def integrate_generated_files
-		
+		@smanger.integrate_source(project_root: @project_root,
+			xcodeproj: @project,
+			source_root: @source_root,
+			group:@group,
+			target:@target)
+
+		binding.pry
 	end
 
 	def old_files_should_not_be_in_group
@@ -97,15 +103,21 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 	end
 
 	def generated_files_should_be_in_correct_group
-		fail("not implemented")
+		files = files_in_xcodeproject_group
+		expect(files).to eql(@new_generated_files)		
 	end
 
 	def generated_files_should_be_in_target
-		fail("not implemented")
+		files = generated_files_in_xcodeproject_target
+		expect(files).to eql(new_generated_m_files)
 	end
 
 	def old_generated_m_files
 		@old_generated_group_files.select{ |f| f.end_with? ".m" }		
+	end
+
+	def new_generated_m_files
+		@new_generated_files.select { |f| f.end_with? ".m" }
 	end
 
 	def files_in_xcodeproject_group
@@ -128,7 +140,7 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 		generated_target_files = target.source_build_phase.files_references.map do |f| 
 			f.hierarchy_path 
 		end.select do |f| 
-			f.start_with?("/IntegrateJ2Objc_Test_Project/generated/")
+			f.start_with?("/#{@group}")
 		end
 
 		file_paths_relative_to_path(generated_target_files, proj[@group].hierarchy_path)
