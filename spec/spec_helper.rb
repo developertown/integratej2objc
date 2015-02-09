@@ -50,3 +50,14 @@ end
 def random_string(set = SAMPLE_ARRAY, len = 5)		
 	len.times.map{ set.sample }.join
 end
+
+def file_paths_relative_to_path(file_paths, path)
+	root_path = Pathname.new(path)
+	file_paths.map do |f|
+		Pathname.new(f).relative_path_from(root_path).to_s
+	end.sort
+end
+
+def all_files_in_directory(dir)
+	Dir.glob("#{dir}/**/*").select{|f| !File.directory?(f) }
+end

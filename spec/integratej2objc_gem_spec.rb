@@ -45,7 +45,13 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 		@target = "IntegrateJ2Objc_Test_Project"
 	end
 
-	it "works exactly like before these infernal tests" do		
+	it "should fill generated directory with only our generated files" do
+		expect(fixture_path(@generated_root)).to have_same_files_as(path_relative_to_test_temp(@generated_root))
+		files = create_random_generated_files		
+		expect(@generated_files_dir).to contain_only_files(files)
+	end
+
+	xit "works exactly like before these infernal tests" do		
 		capture_old_generated_files
 		prepare_generated_files_for_test
 		old_files_should_be_in_group
@@ -58,13 +64,6 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 		generated_files_should_be_in_correct_group
 		generated_files_should_be_in_target
 	end
-
-	it "should fill generated directory with only our generated files" do
-		expect(fixture_path(@generated_root)).to have_same_files_as(path_relative_to_test_temp(@generated_root))
-		files = create_random_generated_files		
-		expect(@generated_files_dir).to contain_only_files(files)
-	end
-
 
 	def prepare_xcodeproject_for_test
 		@path_for_xcode_project = cp_fixture_to_test_temp("integrateJ2Objc_Test_Project")
@@ -111,74 +110,76 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 
 	def files_in_xcodeproject_group
 		proj = Xcodeproj::Project.open File.join(@project_root, @project)
-		group_hierarchy_path_name = Pathname.new(proj[@group].hierarchy_path)
+		
 		files = proj[@group].recursive_children.select do |o| 
 			o.kind_of? Xcodeproj::Project::Object::PBXFileReference 
 		end.map do |f|
-			Pathname.new(f.hierarchy_path).relative_path_from(group_hierarchy_path_name).to_s
-		end.sort
+			f.hierarchy_path
+		end
+
+		file_paths_relative_to_path(files, proj[@group].hierarchy_path)
 	end
 
 	def generated_files_in_xcodeproject_target
 		proj = Xcodeproj::Project.open File.join(@project_root, @project)
-		group_hierarchy_path_name = Pathname.new(proj[@group].hierarchy_path)
+		
 		target = proj.targets.select{ |t| t.name.eql?(@target)}.first
 
 		generated_target_files = target.source_build_phase.files_references.map do |f| 
 			f.hierarchy_path 
 		end.select do |f| 
 			f.start_with?("/IntegrateJ2Objc_Test_Project/generated/")
-		end.map do |f|
-			Pathname.new(f).relative_path_from(group_hierarchy_path_name).to_s
-		end.sort		
+		end
+
+		file_paths_relative_to_path(generated_target_files, proj[@group].hierarchy_path)
 	end
 	
-	def recursive_files_in_generated_files_dir
-		generated_files_dir_pathname = Pathname.new(@generated_files_dir)
-		Dir.glob("#{@generated_files_dir}/**/*").select{|f| !File.directory?(f) }.map do |f|
-			Pathname.new(f).relative_path_from(generated_files_dir_pathname).to_s
-		end.sort
+	def recursive_files_in_generated_files_dir		
+		files = all_files_in_directory @generated_files_dir
+		file_paths_relative_to_path(files, @generated_files_dir)
 	end
 
-	def create_random_generated_files(class_count=4)		
-		FileUtils.remove_dir(path_relative_to_test_temp(@generated_root), true)
-		
+	def create_random_generated_files(class_count=4)
+		root_count = (class_count / 2).to_i
+		FileUtils.remove_dir(@generated_files_dir, true)		
 		generated_files = []
-		class_count.times do 
-			f = random_string
-			generated_files << path_relative_to_test_temp(File.join(@generated_root,"#{f}.h"))
-			generated_files << path_relative_to_test_temp(File.join(@generated_root,"#{f}.m"))
-		end
+		
+		generated_files += generate_random_files_at_path(root_count, @generated_files_dir)
 
 		sub_name = random_string
-		sub_path = path_relative_to_test_temp(File.join(@generated_root, sub_name))
+		sub_path = File.join(@generated_files_dir, sub_name)		
 		FileUtils.mkdir_p sub_path
 
-		class_count.times do
-			f = random_string
-			generated_files << File.join(sub_path, "#{f}.h")
-			generated_files << File.join(sub_path, "#{f}.m")			
-		end
-		
-		generated_files.each { |f| touch_file(f) }
+		generated_files += generate_random_files_at_path(class_count - root_count, sub_path)
 
+		generated_files.each { |f| touch_file(f) }
+		file_paths_relative_to_path(generated_files, @generated_files_dir)
+	end
+
+	def generate_random_files_at_path(num_files, path)
+		generated_files = []
+		num_files.times do 
+			f = random_string
+			generated_files << File.join(path,"#{f}.h")
+			generated_files << File.join(path,"#{f}.m")
+		end
 		generated_files
 	end
 end
 
 RSpec::Matchers.define :have_same_files_as do |dir|
 	match do |test_dir|
-		expect(Dir.entries(test_dir)).to eql(Dir.entries(dir))
+		test_dir_entries = file_paths_relative_to_path(Dir.glob("#{test_dir}/**/*"), test_dir)
+		dir_entries = file_paths_relative_to_path(Dir.glob("#{dir}/**/*"), dir)
+
+		expect(test_dir_entries).to eql(dir_entries)
 	end
 end
 
-
 RSpec::Matchers.define :contain_only_files do |files|
 	match do |dir|
-		diff  = Dir.entries(dir).reject do |e| 
-			e.match(/(\.)|(\.\.)/) || files.any?{|f| f.ends_with(e)}			
-		end
-		expect(diff.length).to eql(0)
+		actual_files = file_paths_relative_to_path(all_files_in_directory(dir), dir)
+		expect(actual_files).to eql(files)
 	end
 end
 
