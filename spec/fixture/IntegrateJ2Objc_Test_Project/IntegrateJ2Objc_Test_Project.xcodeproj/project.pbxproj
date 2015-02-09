@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		FCC11F091A867D7300E1ABD7 /* Generated1.m in Sources */ = {isa = PBXBuildFile; fileRef = FCC11F061A867D7300E1ABD7 /* Generated1.m */; };
 		FCC11F0A1A867D7300E1ABD7 /* Generated2.m in Sources */ = {isa = PBXBuildFile; fileRef = FCC11F081A867D7300E1ABD7 /* Generated2.m */; };
+		FCC11F0F1A86C6D900E1ABD7 /* Sub1.m in Sources */ = {isa = PBXBuildFile; fileRef = FCC11F0E1A86C6D900E1ABD7 /* Sub1.m */; };
+		FCC11F121A86C6E200E1ABD7 /* Sub2.m in Sources */ = {isa = PBXBuildFile; fileRef = FCC11F111A86C6E200E1ABD7 /* Sub2.m */; };
 		FCD9A0AE1A85727D0042086A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FCD9A0AD1A85727D0042086A /* main.m */; };
 		FCD9A0B11A85727D0042086A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = FCD9A0B01A85727D0042086A /* AppDelegate.m */; };
 		FCD9A0B41A85727D0042086A /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FCD9A0B31A85727D0042086A /* ViewController.m */; };
@@ -33,6 +35,10 @@
 		FCC11F061A867D7300E1ABD7 /* Generated1.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Generated1.m; sourceTree = "<group>"; };
 		FCC11F071A867D7300E1ABD7 /* Generated2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Generated2.h; sourceTree = "<group>"; };
 		FCC11F081A867D7300E1ABD7 /* Generated2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Generated2.m; sourceTree = "<group>"; };
+		FCC11F0D1A86C6D900E1ABD7 /* Sub1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sub1.h; sourceTree = "<group>"; };
+		FCC11F0E1A86C6D900E1ABD7 /* Sub1.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Sub1.m; sourceTree = "<group>"; };
+		FCC11F101A86C6E200E1ABD7 /* Sub2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sub2.h; sourceTree = "<group>"; };
+		FCC11F111A86C6E200E1ABD7 /* Sub2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Sub2.m; sourceTree = "<group>"; };
 		FCD9A0A81A85727D0042086A /* IntegrateJ2Objc_Test_Project.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IntegrateJ2Objc_Test_Project.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FCD9A0AC1A85727D0042086A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FCD9A0AD1A85727D0042086A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -69,6 +75,7 @@
 		FCC11F041A867D7300E1ABD7 /* generated */ = {
 			isa = PBXGroup;
 			children = (
+				FCC11F0C1A86C6BF00E1ABD7 /* sub */,
 				FCC11F051A867D7300E1ABD7 /* Generated1.h */,
 				FCC11F061A867D7300E1ABD7 /* Generated1.m */,
 				FCC11F071A867D7300E1ABD7 /* Generated2.h */,
@@ -76,6 +83,24 @@
 			);
 			path = generated;
 			sourceTree = SOURCE_ROOT;
+		};
+		FCC11F0B1A86C46900E1ABD7 /* other_group */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = other_group;
+			sourceTree = "<group>";
+		};
+		FCC11F0C1A86C6BF00E1ABD7 /* sub */ = {
+			isa = PBXGroup;
+			children = (
+				FCC11F0D1A86C6D900E1ABD7 /* Sub1.h */,
+				FCC11F0E1A86C6D900E1ABD7 /* Sub1.m */,
+				FCC11F101A86C6E200E1ABD7 /* Sub2.h */,
+				FCC11F111A86C6E200E1ABD7 /* Sub2.m */,
+			);
+			path = sub;
+			sourceTree = "<group>";
 		};
 		FCD9A09F1A85727D0042086A = {
 			isa = PBXGroup;
@@ -99,6 +124,7 @@
 			isa = PBXGroup;
 			children = (
 				FCC11F041A867D7300E1ABD7 /* generated */,
+				FCC11F0B1A86C46900E1ABD7 /* other_group */,
 				FCD9A0AF1A85727D0042086A /* AppDelegate.h */,
 				FCD9A0B01A85727D0042086A /* AppDelegate.m */,
 				FCD9A0B21A85727D0042086A /* ViewController.h */,
@@ -237,7 +263,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FCC11F0F1A86C6D900E1ABD7 /* Sub1.m in Sources */,
 				FCD9A0B41A85727D0042086A /* ViewController.m in Sources */,
+				FCC11F121A86C6E200E1ABD7 /* Sub2.m in Sources */,
 				FCD9A0B11A85727D0042086A /* AppDelegate.m in Sources */,
 				FCD9A0AE1A85727D0042086A /* main.m in Sources */,
 				FCC11F091A867D7300E1ABD7 /* Generated1.m in Sources */,
