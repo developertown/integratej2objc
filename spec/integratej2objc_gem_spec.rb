@@ -150,6 +150,16 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 			generated_files << path_relative_to_test_temp(File.join(@generated_root,"#{f}.m"))
 		end
 
+		sub_name = random_string
+		sub_path = path_relative_to_test_temp(File.join(@generated_root, sub_name))
+		FileUtils.mkdir_p sub_path
+
+		class_count.times do
+			f = random_string
+			generated_files << File.join(sub_path, "#{f}.h")
+			generated_files << File.join(sub_path, "#{f}.m")			
+		end
+		
 		generated_files.each { |f| touch_file(f) }
 
 		generated_files
