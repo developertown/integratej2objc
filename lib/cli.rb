@@ -2,6 +2,7 @@
 
 require 'rubygems'
 require 'thor'
+require 'j2objc_shared_lib_smanger'
 
 module IntegrateJ2objc
 	class CLI < Thor

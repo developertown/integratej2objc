@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'pry'
 require 'pathname'
 
 describe "spec helper" do
@@ -248,7 +247,7 @@ end
 
 RSpec::Matchers.define :match_files_in_project_group do |project, group|
 	match do |files|
-		
+
 		group_actual_files = project[group].recursive_children.select do |o| 
 			o.kind_of? Xcodeproj::Project::Object::PBXFileReference 
 		end.map do |f|
