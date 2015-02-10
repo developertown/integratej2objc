@@ -15,7 +15,14 @@ module IntegrateJ2objc
 		aliases: "-p"
 		method_option :xcodeproj, required: true, type: :string, aliases: "-x"
 		method_option :source_root, required: true, type: :string, aliases: "-s"
-		method_option :group, required: true, type: :string, aliases: "-g"
+		method_option :group, required: true, type: :string, aliases: "-g", 
+			desc: "This is the path to the group you are targeting from the xcode project, in Xcode"+
+			" For example in Xcode Project Navigator you see:\n"+
+			"\t\t\t\tMyProject.xcodeproj\n"+
+			"\t\t\t\t  \u2514 MyProject\n"+
+			"\t\t\t\t      \u2514 generated\n" +
+			"\t\t\t\twould have a group argument: -g \"MyProject/generated\""
+				
 		method_option :target, required: true, type: :string, aliases: "-t"		
 		def integrate_source()
 			J2ObjcSharedLibSmanger.new().integrate_source(options);
