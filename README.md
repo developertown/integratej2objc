@@ -23,8 +23,13 @@ Options:
   -p, --project-root=PROJECT_ROOT  
   -x, --xcodeproj=XCODEPROJ        
   -s, --source-root=SOURCE_ROOT    
-  -g, --group=GROUP                
-  -t, --target=TARGET              
+  -g, --group=GROUP   # This is the path to the group you are targeting from the xcode 
+        project, in Xcode For example in Xcode Project Navigator you see:
+				  MyProject.xcodeproj
+				    └ MyProject
+				        └ generated
+				would have a group argument: -g "MyProject/generated"
+  -t, --target=TARGET               
 
 For use with any source directory and Xcode project. Removes GROUP and descendant files from XCODEPROJ and then adds all directories and files from SOURCE_ROOT, recursively, to the GROUP and TARGET
 ```
