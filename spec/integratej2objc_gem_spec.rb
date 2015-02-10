@@ -69,14 +69,6 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 		expect("group1/group2/group3").to be_child_of_group("group1/group2", project)
 	end
 
-	RSpec::Matchers.define :be_child_of_group do |parent_group, project|
-		match do |group|
-			group_obj = project[group]
-			parent_obj = project[parent_group]
-			expect(group_obj.parent).to eql(parent_obj)
-		end
-	end
-
 	it "should have correct files in new group" do
 		project = Xcodeproj::Project.open(@project_path)
 		prepare_generated_files_for_test
@@ -84,21 +76,6 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 		expect(@new_generated_files).to match_files_in_project_group(project, "group1/group2/group3")
 	end
 	
-	RSpec::Matchers.define :match_files_in_project_group do |project, group|
-		match do |files|
-							
-			group_actual_files = project[group].recursive_children.select do |o| 
-				o.kind_of? Xcodeproj::Project::Object::PBXFileReference 
-			end.map do |f|
-				f.hierarchy_path
-			end
-
-			group_actual_files = file_paths_relative_to_path(group_actual_files, project[group].hierarchy_path)
-
-			expect(group_actual_files).to eql(files)
-		end
-	end
-
 	it "works exactly like before these infernal tests" do		
 		capture_old_generated_files
 		prepare_generated_files_for_test
@@ -258,5 +235,28 @@ RSpec::Matchers.define :be_a_file_at_path_containing_text do |path, text|
 		expect(file).to(end_with(path)) &&
 		expect(File.exists?(file)).to(be_truthy) &&
 		expect(File.read(file)).to(eql(text))
+	end
+end
+
+RSpec::Matchers.define :be_child_of_group do |parent_group, project|
+	match do |group|
+		group_obj = project[group]
+		parent_obj = project[parent_group]
+		expect(group_obj.parent).to eql(parent_obj)
+	end
+end
+
+RSpec::Matchers.define :match_files_in_project_group do |project, group|
+	match do |files|
+		
+		group_actual_files = project[group].recursive_children.select do |o| 
+			o.kind_of? Xcodeproj::Project::Object::PBXFileReference 
+		end.map do |f|
+			f.hierarchy_path
+		end
+
+		group_actual_files = file_paths_relative_to_path(group_actual_files, project[group].hierarchy_path)
+
+		expect(group_actual_files).to eql(files)
 	end
 end
