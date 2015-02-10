@@ -9,8 +9,6 @@ module IntegrateJ2objc
 			group = options[:group]
 			target = options[:target]
 
-			binding.pry
-			
 			command_relative_group_root = File.join(project_root, source_root)
 
 			current_project = Xcodeproj::Project.open File.join(project_root, project)
@@ -19,6 +17,7 @@ module IntegrateJ2objc
 
 			added_references = recreate_group_at_root(group, project_root, source_root, current_project)
 
+			binding.pry
 
 			target_obj = target_named_in_project(target, current_project)
 
@@ -32,29 +31,18 @@ module IntegrateJ2objc
 			current_project.save
 		end
 
-
-		
-		def files_for_group(group_name, project)
-			group_actual = project[group_name]
-			puts "getting files for group: #{group_actual.pretty_print}"
-			group_actual.files
-		end
-
 		def remove_old_group_and_files(group_name, project)
-			old_group = project["objc_gen"]
+			old_group = project[group_name]
 			if old_group then
-				remove_group_files_from_project(old_group)				
+				old_group.recursive_children.each do |child|
+					child.remove_from_project
+				end
 				old_group.remove_from_project
 			end
 		end
 
-		def remove_group_files_from_project(group)
-			group.files.each do |file| 
-				file.remove_from_project
-			end
-		end
-
 		def recreate_group_at_root(group_name, project_root, path_relative_to_project, project)
+			binding.pry
 			new_group = project.new_group(group_name, path_relative_to_project, :project)
 			add_tree_to_group(File.join(project_root, path_relative_to_project), new_group)
 		end

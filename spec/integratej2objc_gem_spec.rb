@@ -38,8 +38,12 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 		@generated_root = File.join("IntegrateJ2Objc_Test_Project","generated")
 		@generated_files_dir = path_relative_to_test_temp(@generated_root)
 
+
 		@project_root = path_relative_to_test_temp("IntegrateJ2Objc_Test_Project")
 		@project = "IntegrateJ2Objc_Test_Project.xcodeproj"
+
+		@project_path = File.join(@project_root, @project)
+
 		@source_root = "generated"
 		@group = "IntegrateJ2Objc_Test_Project/generated"
 		@target = "IntegrateJ2Objc_Test_Project"
@@ -51,7 +55,14 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 		expect(@generated_files_dir).to contain_only_files(files)
 	end
 
-	it "works exactly like before these infernal tests" do		
+	it "should remove old group and files from project" do
+		project = Xcodeproj::Project.open(@project_path)
+		@smanger.remove_old_group_and_files(@group, project)
+
+		expect(project).not_to have_group_named(@group)
+	end
+
+	xit "works exactly like before these infernal tests" do		
 		capture_old_generated_files
 		prepare_generated_files_for_test
 		old_files_should_be_in_group
@@ -88,8 +99,6 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 			source_root: @source_root,
 			group:@group,
 			target:@target)
-
-		binding.pry
 	end
 
 	def old_files_should_not_be_in_group
@@ -176,6 +185,13 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 			generated_files << File.join(path,"#{f}.m")
 		end
 		generated_files
+	end
+end
+
+RSpec::Matchers.define :have_group_named do |group|
+	match do |project|
+		binding.pry
+		expect(project[group]).not_to be_nil
 	end
 end
 
