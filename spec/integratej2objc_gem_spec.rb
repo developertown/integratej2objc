@@ -62,7 +62,44 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 		expect(project).not_to have_group_named(@group)
 	end
 
-	xit "works exactly like before these infernal tests" do		
+	it "should create new group in project in appropriate sub group" do
+		project = Xcodeproj::Project.open(@project_path)
+		prepare_generated_files_for_test
+		@smanger.recreate_group_at_root("group1/group2/group3", @project_root, @source_root, project)
+		expect("group1/group2/group3").to be_child_of_group("group1/group2", project)
+	end
+
+	RSpec::Matchers.define :be_child_of_group do |parent_group, project|
+		match do |group|
+			group_obj = project[group]
+			parent_obj = project[parent_group]
+			expect(group_obj.parent).to eql(parent_obj)
+		end
+	end
+
+	it "should have correct files in new group" do
+		project = Xcodeproj::Project.open(@project_path)
+		prepare_generated_files_for_test
+		@smanger.recreate_group_at_root("group1/group2/group3", @project_root, @source_root, project)
+		expect(@new_generated_files).to match_files_in_project_group(project, "group1/group2/group3")
+	end
+	
+	RSpec::Matchers.define :match_files_in_project_group do |project, group|
+		match do |files|
+							
+			group_actual_files = project[group].recursive_children.select do |o| 
+				o.kind_of? Xcodeproj::Project::Object::PBXFileReference 
+			end.map do |f|
+				f.hierarchy_path
+			end
+
+			group_actual_files = file_paths_relative_to_path(group_actual_files, project[group].hierarchy_path)
+
+			expect(group_actual_files).to eql(files)
+		end
+	end
+
+	it "works exactly like before these infernal tests" do		
 		capture_old_generated_files
 		prepare_generated_files_for_test
 		old_files_should_be_in_group
@@ -108,7 +145,7 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 
 	def old_files_should_not_be_in_target
 		files = generated_files_in_xcodeproject_target
-		expect(files).no_to eql(old_generated_m_files)		
+		expect(files).not_to eql(old_generated_m_files)		
 	end
 
 	def generated_files_should_be_in_correct_group
@@ -190,7 +227,6 @@ end
 
 RSpec::Matchers.define :have_group_named do |group|
 	match do |project|
-		binding.pry
 		expect(project[group]).not_to be_nil
 	end
 end

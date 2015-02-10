@@ -16,8 +16,7 @@ module IntegrateJ2objc
 			remove_old_group_and_files group, current_project
 
 			added_references = recreate_group_at_root(group, project_root, source_root, current_project)
-
-			binding.pry
+			
 
 			target_obj = target_named_in_project(target, current_project)
 
@@ -42,9 +41,28 @@ module IntegrateJ2objc
 		end
 
 		def recreate_group_at_root(group_name, project_root, path_relative_to_project, project)
-			binding.pry
-			new_group = project.new_group(group_name, path_relative_to_project, :project)
-			add_tree_to_group(File.join(project_root, path_relative_to_project), new_group)
+			groups = Pathname(group_name).each_filename.to_a
+
+			first, *rest = *groups
+			memo = nil
+			list = nil
+
+			if (project[first]) then
+				memo = project[first]
+				list = rest
+			else
+				memo = project.main_group
+				list = groups
+			end
+			
+			group = list.reduce(memo) do |memo, name|
+				memo[name] || memo.new_group(name)				
+			end
+
+			group.set_path path_relative_to_project
+			group.set_source_tree :project
+
+			add_tree_to_group(File.join(project_root, path_relative_to_project), group)
 		end
 
 		def target_named_in_project(target_name, project) 
