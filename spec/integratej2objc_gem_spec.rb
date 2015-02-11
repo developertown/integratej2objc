@@ -38,10 +38,9 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 		@generated_files_dir = path_relative_to_test_temp(@generated_root)
 
 
-		@project_root = path_relative_to_test_temp("IntegrateJ2Objc_Test_Project")
-		@project = "IntegrateJ2Objc_Test_Project.xcodeproj"
-
-		@project_path = File.join(@project_root, @project)
+		@project = path_relative_to_test_temp(File.join("IntegrateJ2Objc_Test_Project","IntegrateJ2Objc_Test_Project.xcodeproj"))
+		@project_root = File.dirname(@project)
+		@project_path = @project
 
 		@source_root = "generated"
 		@group = "IntegrateJ2Objc_Test_Project/generated"
@@ -107,8 +106,7 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 	end
 
 	def integrate_generated_files
-		@smanger.integrate_source(project_root: @project_root,
-			xcodeproj: @project,
+		@smanger.integrate_source(xcodeproj: @project,
 			source_root: @source_root,
 			group:@group,
 			target:@target)
@@ -143,7 +141,7 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 	end
 
 	def files_in_xcodeproject_group
-		proj = Xcodeproj::Project.open File.join(@project_root, @project)
+		proj = Xcodeproj::Project.open @project
 		
 		files = proj[@group].recursive_children.select do |o| 
 			o.kind_of? Xcodeproj::Project::Object::PBXFileReference 
@@ -155,7 +153,7 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 	end
 
 	def generated_files_in_xcodeproject_target
-		proj = Xcodeproj::Project.open File.join(@project_root, @project)
+		proj = Xcodeproj::Project.open @project
 		
 		target = proj.targets.select{ |t| t.name.eql?(@target)}.first
 

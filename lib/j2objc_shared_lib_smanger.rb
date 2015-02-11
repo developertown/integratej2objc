@@ -1,17 +1,18 @@
 require 'xcodeproj'
-
+require 'pry'
 module IntegrateJ2objc
 	class J2ObjcSharedLibSmanger
-		def integrate_source(options)
-			project_root = options[:project_root]
+		def integrate_source(options)			
 			project = options[:xcodeproj]
 			source_root = options[:source_root]
 			group = options[:group]
 			target = options[:target]
 
+			project_root = File.dirname(project)
+
 			command_relative_group_root = File.join(project_root, source_root)
 
-			current_project = Xcodeproj::Project.open File.join(project_root, project)
+			current_project = Xcodeproj::Project.open project
 
 			remove_old_group_and_files group, current_project
 
@@ -61,7 +62,7 @@ module IntegrateJ2objc
 
 			group.set_path path_relative_to_project
 			group.set_source_tree :project
-
+			binding.pry
 			add_tree_to_group(File.join(project_root, path_relative_to_project), group)
 		end
 
