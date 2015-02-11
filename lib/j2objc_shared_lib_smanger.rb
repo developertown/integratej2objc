@@ -62,7 +62,6 @@ module IntegrateJ2objc
 
 			group.set_path path_relative_to_project
 			group.set_source_tree :project
-			binding.pry
 			add_tree_to_group(File.join(project_root, path_relative_to_project), group)
 		end
 

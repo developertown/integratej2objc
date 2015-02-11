@@ -88,6 +88,12 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 		generated_files_should_be_in_target
 	end
 
+	it "should teach me about relative paths and dirname" do
+		path = "spec/fixture/test_temp/IntegrateJ2Objc_Test_Project/IntegrateJ2Objc_Test_Project.xcodeproj"
+		puts File.dirname(path)
+		expect(File.dirname(path)).to eql(File.absolute_path(path))
+	end
+
 	def prepare_xcodeproject_for_test
 		@path_for_xcode_project = cp_fixture_to_test_temp("integrateJ2Objc_Test_Project")
 	end
