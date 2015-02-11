@@ -11,14 +11,17 @@ Install it:
 
 ```
 Usage:
-  integratej2objc integrate_source -g, --group=GROUP -p, --project-root=PROJECT_ROOT -s, --source-root=SOURCE_ROOT -t, --target=TARGET -x, --xcodeproj=XCODEPROJ
+  integratej2objc integrate_source -g, --group=GROUP -s, --source-root=SOURCE_ROOT -t, --target=TARGET -x, --xcodeproj=XCODEPROJ
 
 Options:
-  -p, --project-root=PROJECT_ROOT  
-  -x, --xcodeproj=XCODEPROJ        
-  -s, --source-root=SOURCE_ROOT    
-  -g, --group=GROUP                
-  -t, --target=TARGET              
+  -x, --xcodeproj=XCODEPROJ      # relative or absolute path to yourproject.xcodeproj, including yourproject.xcodeproj
+  -s, --source-root=SOURCE_ROOT  # the relatitve path from yourproject.xcodeproj to the generated sources directory.
+  -g, --group=GROUP              # This is the path to the group you are targeting from the xcode project, in Xcode For example in Xcode Project Navigator you see:
+           MyProject.xcodeproj
+            └ MyProject
+                └ generated
+           would have a group argument: -g "MyProject/generated"
+  -t, --target=TARGET            # the name of the target that generated sources should be added to in your xcode project
 
 For use with any source directory and Xcode project. Removes GROUP and descendant files from XCODEPROJ and then adds all directories and files from SOURCE_ROOT, recursively, to the GROUP and TARGET
 ```
@@ -36,7 +39,7 @@ and a group for your generated source files in the my_proj.xcodeproj called "gen
 from my_project/
 
 ```
-integratej2objc integrate_source -p ios -x my_proj.xcodeproj -s ../shared/generated_objc -g generated -t MyProj
+integratej2objc integrate_source  -x ios/my_proj.xcodeproj -s ../shared/generated_objc -g generated -t MyProj
 ```
 
 this will remove the existing `generated` group from my_proj.xcodeproj and all of it's children files. It will then add it back with a path relative to the project file and add all descendant .h and .m files.  these files will then be added to the target so that they will be compiled.
