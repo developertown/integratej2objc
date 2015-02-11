@@ -20,7 +20,7 @@ module IntegrateJ2objc
 			required: true, 
 			type: :string, 
 			aliases: "-s", 
-			desc: "the relatitve path from yourproject.xcodeproj to the generated sources directory."
+			desc: "the relatitve or absolute path to the generated sources directory."
 		method_option :group,
 			required: true,
 			type: :string,

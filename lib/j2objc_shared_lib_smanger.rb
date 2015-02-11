@@ -4,11 +4,14 @@ module IntegrateJ2objc
 	class J2ObjcSharedLibSmanger
 		def integrate_source(options)			
 			project = options[:xcodeproj]
-			source_root = options[:source_root]
+			generated_source = options[:source_root]
+			# source_root = options[:source_root]
 			group = options[:group]
 			target = options[:target]
 
 			project_root = File.dirname(project)
+
+			source_root = calculate_source_relative_to_project(project, generated_source)
 
 			command_relative_group_root = File.join(project_root, source_root)
 
@@ -18,7 +21,6 @@ module IntegrateJ2objc
 
 			added_references = recreate_group_at_root(group, project_root, source_root, current_project)
 			
-
 			target_obj = target_named_in_project(target, current_project)
 
 			puts "adding files to #{target_obj.name}:"
@@ -29,6 +31,13 @@ module IntegrateJ2objc
 			target_obj.add_file_references(added_references)
 
 			current_project.save
+		end
+
+		def calculate_source_relative_to_project(project, generated_source)
+			project_absolute_path = File.absolute_path(File.dirname(project))
+			generated_source_absolute_path = File.absolute_path(generated_source)
+
+			return Pathname.new(generated_source_absolute_path).relative_path_from(Pathname.new(project_absolute_path)).to_s
 		end
 
 		def remove_old_group_and_files(group_name, project)
