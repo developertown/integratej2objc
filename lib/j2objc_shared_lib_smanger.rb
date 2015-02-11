@@ -1,5 +1,5 @@
 require 'xcodeproj'
-require 'pry'
+
 module IntegrateJ2objc
 	class J2ObjcSharedLibSmanger
 		def integrate_source(options)			
