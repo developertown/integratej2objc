@@ -38,12 +38,12 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 		@generated_files_dir = path_relative_to_test_temp(@generated_root)
 
 
-		@project_root = path_relative_to_test_temp("IntegrateJ2Objc_Test_Project")
-		@project = "IntegrateJ2Objc_Test_Project.xcodeproj"
+		@project = path_relative_to_test_temp(File.join("IntegrateJ2Objc_Test_Project","IntegrateJ2Objc_Test_Project.xcodeproj"))
+		@project_root = File.dirname(@project)
+		@project_path = @project
 
-		@project_path = File.join(@project_root, @project)
-
-		@source_root = "generated"
+		@source_root = @generated_files_dir
+		@relative_source_root = @smanger.calculate_source_relative_to_project(@project, @source_root)
 		@group = "IntegrateJ2Objc_Test_Project/generated"
 		@target = "IntegrateJ2Objc_Test_Project"
 	end
@@ -71,22 +71,45 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 	it "should have correct files in new group" do
 		project = Xcodeproj::Project.open(@project_path)
 		prepare_generated_files_for_test
-		@smanger.recreate_group_at_root("group1/group2/group3", @project_root, @source_root, project)
+		@smanger.recreate_group_at_root("group1/group2/group3", @project_root, @relative_source_root, project)
 		expect(@new_generated_files).to match_files_in_project_group(project, "group1/group2/group3")
+	end
+
+	it "should have correct relative path for close shared parent" do
+		project = "/path1/path2/path3/proj"
+		source = "/path1/path2/path3/source"
+		relative = @smanger.calculate_source_relative_to_project(project, source)
+		expect(relative).to eql("source")
+	end
+
+	it "should have the correct relative path for distant shared parent" do
+		project = "/path1/path2/path3/proj"
+		source = "/path1/path2/path4/source"
+		relative = @smanger.calculate_source_relative_to_project(project, source)
+		expect(relative).to eql("../path4/source")
 	end
 	
 	it "works exactly like before these infernal tests" do		
-		capture_old_generated_files
-		prepare_generated_files_for_test
-		old_files_should_be_in_group
-		
-		integrate_generated_files
-		
-		old_files_should_not_be_in_group
-		old_files_should_not_be_in_target
+		verify_integration
+	end
 
-		generated_files_should_be_in_correct_group
-		generated_files_should_be_in_target
+	it "should work with a relative path to project" do
+		absolute_project_path = path_relative_to_test_temp(File.join("IntegrateJ2Objc_Test_Project","IntegrateJ2Objc_Test_Project.xcodeproj"))
+
+		@project = path_relative_to_working_directory absolute_project_path
+		@project_root = File.dirname(@project)
+		@project_path = @project
+
+		verify_integration
+	end
+
+	it "should work with a relative source path for project" do
+		@source_root = path_relative_to_working_directory(@generated_files_dir)
+		verify_integration
+	end
+
+	def path_relative_to_working_directory(path)
+		Pathname.new(path).relative_path_from(Pathname.new(FileUtils.pwd)).to_s
 	end
 
 	def prepare_xcodeproject_for_test
@@ -106,9 +129,22 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 		expect(files).to eql(@old_generated_group_files)
 	end
 
+	def verify_integration
+		capture_old_generated_files
+		prepare_generated_files_for_test
+		old_files_should_be_in_group
+		
+		integrate_generated_files
+		
+		old_files_should_not_be_in_group
+		old_files_should_not_be_in_target
+
+		generated_files_should_be_in_correct_group
+		generated_files_should_be_in_target
+	end
+
 	def integrate_generated_files
-		@smanger.integrate_source(project_root: @project_root,
-			xcodeproj: @project,
+		@smanger.integrate_source(xcodeproj: @project,
 			source_root: @source_root,
 			group:@group,
 			target:@target)
@@ -143,7 +179,7 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 	end
 
 	def files_in_xcodeproject_group
-		proj = Xcodeproj::Project.open File.join(@project_root, @project)
+		proj = Xcodeproj::Project.open @project
 		
 		files = proj[@group].recursive_children.select do |o| 
 			o.kind_of? Xcodeproj::Project::Object::PBXFileReference 
@@ -155,7 +191,7 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 	end
 
 	def generated_files_in_xcodeproject_target
-		proj = Xcodeproj::Project.open File.join(@project_root, @project)
+		proj = Xcodeproj::Project.open @project
 		
 		target = proj.targets.select{ |t| t.name.eql?(@target)}.first
 
