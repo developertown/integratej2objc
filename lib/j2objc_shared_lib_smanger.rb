@@ -40,38 +40,28 @@ module IntegrateJ2objc
 			return Pathname.new(generated_source_absolute_path).relative_path_from(Pathname.new(project_absolute_path)).to_s
 		end
 
-		def remove_old_group_and_files(group_name, project)
-			old_group = project[group_name]
-			if old_group then
-				old_group.recursive_children.each do |child|
-					child.remove_from_project
-				end
+		def remove_old_group_and_files(group_name, project)			
+			if old_group = project[group_name]
+				old_group.recursive_children.each { |child| child.remove_from_project }
 				old_group.remove_from_project
 			end
 		end
 
 		def recreate_group_at_root(group_name, project_root, path_relative_to_project, project)
+			group = ensure_group(group_name, project, path_relative_to_project)
+			add_tree_to_group(File.join(project_root, path_relative_to_project), group)
+		end
+
+		def ensure_group(group_name, project, path_relative_to_project)
 			groups = Pathname(group_name).each_filename.to_a
-
-			first, *rest = *groups
-			memo = nil
-			list = nil
-
-			if (project[first]) then
-				memo = project[first]
-				list = rest
-			else
-				memo = project.main_group
-				list = groups
-			end
 			
-			group = list.reduce(memo) do |memo, name|
-				memo[name] || memo.new_group(name)				
+			group = groups.reduce(project) do |p, name| 
+				p[name] || p.new_group(name) 
 			end
 
 			group.set_path path_relative_to_project
 			group.set_source_tree :project
-			add_tree_to_group(File.join(project_root, path_relative_to_project), group)
+			group
 		end
 
 		def target_named_in_project(target_name, project) 
@@ -85,13 +75,10 @@ module IntegrateJ2objc
 
 			dir_obj = Dir.new(base_path_for_dir)
 
-
-			dir_obj.each do |f| 
-				next if path_is_relative_directory? f
-
+			elegible_files_in(dir_obj).each do |f| 
 				full_file_path = File.join(base_path_for_dir, f)
 
-				if (File.directory? full_file_path) then
+				if (File.directory? full_file_path)
 					d_group = group.new_group(f, f, :group)					
 					puts "added directory: #{d_group.hierarchy_path}"
 					file_references += add_tree_to_group(File.join(base_path_for_dir, f),  d_group)
@@ -103,12 +90,15 @@ module IntegrateJ2objc
 			file_references
 		end
 
+		def elegible_files_in(dir)
+			dir.reject { |f| path_is_relative_directory?(f) || f.start_with?(".") }
+		end
+
 		def path_is_relative_directory?(path)
-			return (path.eql?("..") || path.eql?("."))
+			(path.eql?("..") || path.eql?("."))
 		end
 
 		def add_file_to_group(file, group)
-			return if file.start_with? "."
 			file_reference = group.new_file(file, :group)
 			puts "added file: #{file_reference.hierarchy_path}"			
 			file_reference

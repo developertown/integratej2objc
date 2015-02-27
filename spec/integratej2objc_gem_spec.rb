@@ -2,12 +2,11 @@ require 'spec_helper'
 require 'pathname'
 
 describe "spec helper" do
-	before :each do
-		@fixture = cp_fixture_to_test_temp("test_fixture.txt")
-	end
+	
+	let(:fixture){ cp_fixture_to_test_temp("test_fixture.txt") }
 	
 	it "should do the right thing with copying a fixture" do		
-		expect(@fixture).to be_a_file_at_path_containing_text("test_temp/test_fixture.txt", "A File!")
+		expect(fixture).to be_a_file_at_path_containing_text("test_temp/test_fixture.txt", "A File!")
 	end
 
 	it "should remove test temp directory entirely" do
@@ -30,10 +29,12 @@ end
 
 describe IntegrateJ2objc::J2ObjcSharedLibSmanger do  
 
+	subject { IntegrateJ2objc::J2ObjcSharedLibSmanger.new() }
+
 	before :each do
 		clean_test_temp
 		prepare_xcodeproject_for_test
-		@smanger = IntegrateJ2objc::J2ObjcSharedLibSmanger.new()
+
 		@generated_root = File.join("IntegrateJ2Objc_Test_Project","generated")
 		@generated_files_dir = path_relative_to_test_temp(@generated_root)
 
@@ -43,7 +44,7 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 		@project_path = @project
 
 		@source_root = @generated_files_dir
-		@relative_source_root = @smanger.calculate_source_relative_to_project(@project, @source_root)
+		@relative_source_root = subject.calculate_source_relative_to_project(@project, @source_root)
 		@group = "IntegrateJ2Objc_Test_Project/generated"
 		@target = "IntegrateJ2Objc_Test_Project"
 	end
@@ -56,7 +57,7 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 
 	it "should remove old group and files from project" do
 		project = Xcodeproj::Project.open(@project_path)
-		@smanger.remove_old_group_and_files(@group, project)
+		subject.remove_old_group_and_files(@group, project)
 
 		expect(project).not_to have_group_named(@group)
 	end
@@ -64,28 +65,28 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 	it "should create new group in project in appropriate sub group" do
 		project = Xcodeproj::Project.open(@project_path)
 		prepare_generated_files_for_test
-		@smanger.recreate_group_at_root("group1/group2/group3", @project_root, @source_root, project)
+		subject.recreate_group_at_root("group1/group2/group3", @project_root, @source_root, project)
 		expect("group1/group2/group3").to be_child_of_group("group1/group2", project)
 	end
 
 	it "should have correct files in new group" do
 		project = Xcodeproj::Project.open(@project_path)
 		prepare_generated_files_for_test
-		@smanger.recreate_group_at_root("group1/group2/group3", @project_root, @relative_source_root, project)
+		subject.recreate_group_at_root("group1/group2/group3", @project_root, @relative_source_root, project)
 		expect(@new_generated_files).to match_files_in_project_group(project, "group1/group2/group3")
 	end
 
 	it "should have correct relative path for close shared parent" do
 		project = "/path1/path2/path3/proj"
 		source = "/path1/path2/path3/source"
-		relative = @smanger.calculate_source_relative_to_project(project, source)
+		relative = subject.calculate_source_relative_to_project(project, source)
 		expect(relative).to eql("source")
 	end
 
 	it "should have the correct relative path for distant shared parent" do
 		project = "/path1/path2/path3/proj"
 		source = "/path1/path2/path4/source"
-		relative = @smanger.calculate_source_relative_to_project(project, source)
+		relative = subject.calculate_source_relative_to_project(project, source)
 		expect(relative).to eql("../path4/source")
 	end
 	
@@ -144,7 +145,7 @@ describe IntegrateJ2objc::J2ObjcSharedLibSmanger do
 	end
 
 	def integrate_generated_files
-		@smanger.integrate_source(xcodeproj: @project,
+		subject.integrate_source(xcodeproj: @project,
 			source_root: @source_root,
 			group:@group,
 			target:@target)
