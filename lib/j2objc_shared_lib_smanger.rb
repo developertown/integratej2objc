@@ -27,7 +27,7 @@ module IntegrateJ2objc
 			added_references.each do |f|
 				puts "\t#{f.hierarchy_path}"
 			end
-			target_obj.source_build_phase.clear
+			# target_obj.source_build_phase.clear
 			target_obj.add_file_references(added_references)
 
 			current_project.save
